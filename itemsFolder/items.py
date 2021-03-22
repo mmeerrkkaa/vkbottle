@@ -50,7 +50,7 @@ def findItem(message, item):
             break
     return text, i
 
-def itemUnPack(message, item):
+def itemUnPack(message, item, count = 1):
     invet = profile.GetInv(message)
     
 
@@ -60,16 +60,19 @@ def itemUnPack(message, item):
 
             for q in i["add"]:
               #  print(item.data[q])
-                invet.append(data[q])
+                if addItem(message, data[q], count) == "инвентарь полон":
+                    return "инвентарь полон"
+
+                #invet.append(data[q])
 
                 adds += f'{q}\n'
 
             invet.remove(i)
             break
     
-    invAdd = json.dumps(invet)
-    cursor.execute('UPDATE users SET inv=(?) where id_member=(?)', (invAdd, message.peer_id))
-    conn.commit()
+   # invAdd = json.dumps(invet)
+   # cursor.execute('UPDATE users SET inv=(?) where id_member=(?)', (invAdd, message.peer_id))
+ #   conn.commit()
     if len(adds) == 0:
         return "У вас нет этого предмета"
     return f"получено:\n{adds}"
@@ -81,20 +84,24 @@ def addItem(message, itemd, count):
     inv = json.loads(memb[8])
     nex = True
     
-        
+    print(len(inv), memb[7])
+    if len(inv) >= memb[7]:
+        return "инвентарь полон"
 
-    if itemd["count"] == 0:
-        if len(inv) >= len(memb[7]):
-            return "инвентарь полон"
+    elif itemd["count"] == 0:
+        for _ in range(count):
+            inv.append(itemd)
+            nex = False
 
     else:
         for i in inv:
             if i["name"] == itemd["name"]:
                 inv[inv.index(i)]["count"] += count
                 print("yes")
-                nex = False
+                nex = False                    
                 break
     if nex == True:
+        itemd["count"] = count
         inv.append(itemd)
             
     

@@ -85,10 +85,14 @@ async def inventary(message: Message):
         await start(message)
         return 0
 
+    countKey = 0
     for i in invet:
-
-        keyinv.add(Text(i['name'],payload={"cmd": "item", "item": i["name"]}))
-        keyinv.row()
+        if countKey < 9:
+            keyinv.add(Text(i['name'],payload={"cmd": "item", "item": i["name"]}))
+            keyinv.row()
+            countKey += 1
+        else:
+            break
     keyinv.add(Text(f"В меню", payload={"cmd": "menu"}))
     await message.answer(message=profile.sendInv(message),keyboard=keyinv.get_json())
     
@@ -165,9 +169,9 @@ conn = sqlite3.connect("Vk.db") # или :memory:
 cursor = conn.cursor()
 
 
-#cursor.execute(f"DROP TABLE IF EXISTS users;")
-#cursor.execute(f"CREATE TABLE users(ids INTEGER PRIMARY KEY NOT NULL,nick TEXT, id_member INTEGER, lvl INTEGER, xp INTEGER, hp INTEGER, war TEXT, countItem INTEGER, inv TEXT, money INTEGER);")
-#conn.commit()
+cursor.execute(f"DROP TABLE IF EXISTS users;")
+cursor.execute(f"CREATE TABLE users(ids INTEGER PRIMARY KEY NOT NULL,nick TEXT, id_member INTEGER, lvl INTEGER, xp INTEGER, hp INTEGER, war TEXT, countItem INTEGER, inv TEXT, money INTEGER);")
+conn.commit()
 
 #cursor.execute(f"CREATE TABLE будущий аукцион();")
 
