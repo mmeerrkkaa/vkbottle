@@ -26,7 +26,7 @@ def registration(message, nick):
     war = [10 ,1 ,0, 0, 0] # хп, дамаг, броня, шанс уворота, шанс крит демеджа
     sqliteAdd = json.dumps(war)
 
-    gift = ["Коробка со слабой рапирой жизни"]
+    gift = ["Коробка со слабой рапирой жизни", "Подарок новичка"]
     inv = []
     gifts = ""
     for i in gift:

@@ -57,7 +57,7 @@ def itemUnPack(message, item, count = 1, cpack = 1):
         adds = ""
         for i in invet:
             if i["name"] == str(item):
-                invet.remove(i) # не раб
+              #  invet.remove(i) # не раб
                 for q in i["add"]:
                 #  print(item.data[q])
                     if addItem(message, data[q], count) == "инвентарь полон":
@@ -65,7 +65,7 @@ def itemUnPack(message, item, count = 1, cpack = 1):
 
                     #invet.append(data[q])
 
-                    adds += f'{q}\n'
+                    adds += f'{q} x{count}\n'
 
                 
                 break
@@ -110,8 +110,42 @@ def addItem(message, itemd, count):
     return "1"
 
 
+def removeItem(message, itemd, count):
+    print(123)
+    memb = profile.GetProfile(message)
+    inv = json.loads(memb[8])
+    for x in inv:
+        if x["name"] == itemd:
+            itemd = x
+            break
+    nex = True
 
+    if itemd["count"] == 0 or itemd["count"] == 1:
+        for _ in range(count):
+            inv.remove(itemd)
 
+    else:
+        for i in inv:
+            if i["name"] == itemd["name"]:
+
+                if inv[inv.index(i)]["count"]-count > 1: 
+                    inv[inv.index(i)]["count"] -= count
+                    print("yes")
+                    nex = False                    
+                    break
+                else:
+                    inv.remove(itemd)
+                    break
+
+            
+    
+    
+    invAdd = json.dumps(inv)
+    cursor.execute('UPDATE users SET inv=(?) where id_member=(?)', (invAdd, message.peer_id))
+    conn.commit()
+
+    
+    return f"Удалено: {itemd['name']} {count} шт"
 
 
 

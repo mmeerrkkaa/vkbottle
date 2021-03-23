@@ -105,8 +105,15 @@ async def unpacks(message: Message):
     item = message.get_payload_json()["item"]
     count = message.get_payload_json()["count"]
     await message.answer(items.itemUnPack(message, item, count))
+    await message.answer(items.removeItem(message, item, count))
     await start(message)
 
+@bot.on.message(payload_map={"cmd": "DropItem", "item": str, "count": int})
+async def DropItems(message: Message):
+    item = message.get_payload_json()["item"]
+    count = message.get_payload_json()["count"]
+    await message.answer(items.removeItem(message, item, count))
+    await inventary(message)
 
 
 
@@ -126,32 +133,32 @@ async def finditem(message: Message, item: Optional[str] = None):
         keyinv = Keyboard(one_time=True, inline=False)
         keyinv.add(Text(f"Распаковать", payload={"cmd": "unpack", "item": item, "count": 1}))
         if fin[1]["count"] > 1:
-            keyinv.add(Text(f"Распаковать Все", payload={"cmd": "unpack", "item": item, "count": int(fin[1]["count"])}))
+            keyinv.add(Text(f"Распаковать Все {fin[1]['count']}", payload={"cmd": "unpack", "item": item, "count": int(fin[1]["count"])}))
         keyinv.row()
         keyinv.add(Text("Назад", payload={"cmd": "invent"}))
         await message.answer(fin[0], keyboard = keyinv)
 
     elif fin[1]["type"] == "броня":
-        await message.answer("кнопок надеть, выбросить пока нету. Те введут в меню")
+        await message.answer("кнопок надеть пока нету. Те введут в меню")
         await message.answer(
         message=fin[0],
         keyboard=(
             Keyboard(one_time=True, inline=False)
             .add(Text(f"Надеть {item}", payload={"cmd": f"menu"}))
-            .add(Text("Выкинуть", payload={"cmd": "menu"}))
+            .add(Text(f"Выкинуть", payload={"cmd": "DropItem", "item": item, "count": int(fin[1]["count"])+1}))
             .row()
             .add(Text("Назад", payload={"cmd": "invent"}))
     ).get_json()
     )
 
     elif fin[1]["type"] == "оружие":
-        await message.answer("кнопок надеть, выбросить пока нету. Те кнопки введут в меню")
+        await message.answer("кнопок надеть пока нету. Те кнопки введут в меню")
         await message.answer(
         message=fin[0],
         keyboard=(
             Keyboard(one_time=True, inline=False)
             .add(Text(f"Надеть {item}", payload={"cmd": f"menu"}))
-            .add(Text("Выкинуть", payload={"cmd": "menu"}))
+            .add(Text(f"Выкинуть", payload={"cmd": "DropItem", "item": item, "count": int(fin[1]["count"])+1}))
             .row()
             .add(Text("Назад", payload={"cmd": "invent"}))
     ).get_json()
