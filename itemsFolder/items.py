@@ -50,29 +50,26 @@ def findItem(message, item):
             break
     return text, i
 
-def itemUnPack(message, item, count = 1):
+def itemUnPack(message, item, count = 1, cpack = 1):
     invet = profile.GetInv(message)
     
+    for i in range(cpack):
+        adds = ""
+        for i in invet:
+            if i["name"] == str(item):
+                invet.remove(i) # не раб
+                for q in i["add"]:
+                #  print(item.data[q])
+                    if addItem(message, data[q], count) == "инвентарь полон":
+                        return "инвентарь полон"
 
-    adds = ""
-    for i in invet:
-        if i["name"] == str(item):
+                    #invet.append(data[q])
 
-            for q in i["add"]:
-              #  print(item.data[q])
-                if addItem(message, data[q], count) == "инвентарь полон":
-                    return "инвентарь полон"
+                    adds += f'{q}\n'
 
-                #invet.append(data[q])
-
-                adds += f'{q}\n'
-
-            invet.remove(i)
-            break
+                
+                break
     
-   # invAdd = json.dumps(invet)
-   # cursor.execute('UPDATE users SET inv=(?) where id_member=(?)', (invAdd, message.peer_id))
- #   conn.commit()
     if len(adds) == 0:
         return "У вас нет этого предмета"
     return f"получено:\n{adds}"
@@ -111,6 +108,9 @@ def addItem(message, itemd, count):
     conn.commit()
 
     return "1"
+
+
+
 
 
 

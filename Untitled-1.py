@@ -100,11 +100,14 @@ async def inventary(message: Message):
 
 
 #@bot.on.message(text=["Распаковать <item>"])
-@bot.on.message(payload_map={"cmd": "unpack", "item": str})
+@bot.on.message(payload_map={"cmd": "unpack", "item": str, "count": int})
 async def unpacks(message: Message):
     item = message.get_payload_json()["item"]
-    await message.answer(items.itemUnPack(message, item))
+    count = message.get_payload_json()["count"]
+    await message.answer(items.itemUnPack(message, item, count))
     await start(message)
+
+
 
 
 @bot.on.message(text=["item <item>"])
@@ -117,15 +120,17 @@ async def finditem(message: Message, item: Optional[str] = None):
         return 0
     
     fin = items.findItem(message, item)
+    
     if fin[1]["type"] == "коробка":
-        await message.answer(
-        message=fin[0],
-        keyboard=(
-            Keyboard(one_time=True, inline=False)
-            .add(Text(f"Распаковать", payload={"cmd": "unpack", "item": item}))
-            .add(Text("Назад", payload={"cmd": "invent"}))
-    ).get_json()
-    )
+
+        keyinv = Keyboard(one_time=True, inline=False)
+        keyinv.add(Text(f"Распаковать", payload={"cmd": "unpack", "item": item, "count": 1}))
+        if fin[1]["count"] > 1:
+            keyinv.add(Text(f"Распаковать Все", payload={"cmd": "unpack", "item": item, "count": int(fin[1]["count"])}))
+        keyinv.row()
+        keyinv.add(Text("Назад", payload={"cmd": "invent"}))
+        await message.answer(fin[0], keyboard = keyinv)
+
     elif fin[1]["type"] == "броня":
         await message.answer("кнопок надеть, выбросить пока нету. Те введут в меню")
         await message.answer(
@@ -164,6 +169,7 @@ async def testbut(message: Message):
 async def test(message: Message):
     itemd = item.data["Подарок новичка"]
     print(items.addItem(message, itemd, 5))
+    await start(message)
 
 conn = sqlite3.connect("Vk.db") # или :memory:
 cursor = conn.cursor()
