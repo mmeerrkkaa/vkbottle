@@ -2,6 +2,7 @@ import sys
 import item
 import json
 import sqlite3
+import random
 # '/path/to/application/app/items'
 sys.path.insert(0, './command')
 import profile
@@ -52,24 +53,46 @@ def findItem(message, item):
 
 def itemUnPack(message, item, count = 1, cpack = 1):
     invet = profile.GetInv(message)
-    
+    print(count, cpack)
+    num = 0
     for i in range(cpack):
         adds = ""
         for i in invet:
             if i["name"] == str(item):
               #  invet.remove(i) # не раб
                 for q in i["add"]:
+
                 #  print(item.data[q])
-                    if addItem(message, data[q], count) == "инвентарь полон":
-                        return "инвентарь полон"
+                    if type(q) != int and addItem(message, data[q], count):
+                        adds += f'{q} x{count}\n'
 
+                    
                     #invet.append(data[q])
-
-                    adds += f'{q} x{count}\n'
+                    if type(q) == int:
+                        for dsad in range(count):
+                        
+                            if q < 0:
+                                num += random.randint(1, abs(q))
+                            else:
+                                num += q
+    
 
                 
                 break
     
+    if num != 0:
+        cursor.execute(f"SELECT money FROM users where id_member={message.peer_id}")
+        moneyuser = cursor.fetchone()
+        gold = num // 1000
+        ag = (num % 1000) // 100
+        med = num % 100
+        cursor.execute(f'UPDATE users SET money={moneyuser[0]+num} where id_member={message.peer_id}')
+        conn.commit()
+
+                    
+        adds += f"Монеты: Золотых: {gold}, Серебрянных: {ag}, Медных: {med}"
+
+
     if len(adds) == 0:
         return "У вас нет этого предмета"
     return f"получено:\n{adds}"
@@ -77,7 +100,9 @@ def itemUnPack(message, item, count = 1, cpack = 1):
 
 def addItem(message, itemd, count):
 
+    count += itemd["count"]
     memb = profile.GetProfile(message)
+
     inv = json.loads(memb[8])
     nex = True
     

@@ -120,11 +120,16 @@ async def DropItems(message: Message):
 @bot.on.message(text=["item <item>"])
 @bot.on.message(payload_map={"cmd": "item", "item": str})
 async def finditem(message: Message, item: Optional[str] = None):
-    item = message.get_payload_json()["item"]
+    
+    try:
+        item = message.get_payload_json()["item"]
+    except:
+        item = item
 
     if item is None:
-        print(1)
         return 0
+    
+
     
     fin = items.findItem(message, item)
     
